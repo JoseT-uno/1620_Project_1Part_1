@@ -6,16 +6,29 @@ class Logic(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        """
+        This section only focuses on the button actions and the function their connected to.
+        """
         self.submit_button.clicked.connect(lambda: self.submit())
         self.choose_button.clicked.connect(lambda: self.choose())
         self.generate_button.clicked.connect(lambda: self.generate_final_result())
+        self.clear_button.clicked.connect(lambda: self.clear_func())
+
         self.candidate_opt_drpdwn.setVisible(False)
+
         self.choose_button.setVisible(False)
         self.generate_button.setVisible(False)
+        self.clear_button.setVisible(False)
+
+        """"
+        This section covers our Checkbox 
+        """
         self.checkBoxCandidate1.setVisible(False)
         self.checkBoxCandidate2.setVisible(False)
         self.checkBoxCandidate3.setVisible(False)
         self.checkBoxCandidate4.setVisible(False)
+
         self.output_section.setVisible(False)
 
     def submit(self):
@@ -94,7 +107,7 @@ class Logic(QMainWindow, Ui_MainWindow):
             if cb.isVisible() and cb.isChecked():
                 selected_candidate.append(cb.text())
         if len(selected_candidate) == 0:
-            self.output_section.setText("Please check another checkbox/candidate")
+            self.output_section.setText("Please choose one or more checkbox/candidate")
             return
         final_result = "Final Result:\n"
         try:
@@ -134,8 +147,37 @@ class Logic(QMainWindow, Ui_MainWindow):
                             final_result += f"Candidate: {name_from_csv} | Score: {score_as_int} | Grade: {grade}\n \n"
             self.output_section.setText(final_result)
             self.output_section.setVisible(True)
+
             for cb in checkbox_opt:
                 cb.setChecked(False)
+
+            self.clear_button.setVisible(True)
+
         except FileNotFoundError:
             self.output_section.setVisible(True)
             self.output_section.setText("No data found!\nSubmit a Name and Score")
+
+    def reset_candidates(self):
+        checkboxes = [
+            self.checkBoxCandidate1,
+            self.checkBoxCandidate2,
+            self.checkBoxCandidate3,
+            self.checkBoxCandidate4
+        ]
+        for cb in checkboxes:
+            cb.setChecked(False)
+            cb.setVisible(False)
+            cb.setText("")
+        self.candidate_opt_drpdwn.clear()
+        self.candidate_opt_drpdwn.setVisible(False)
+        self.generate_button.setVisible(False)
+        self.output_section.clear()
+        self.output_section.setVisible(False)
+        self.choose_button.setVisible(False)
+        self.clear_button.setVisible(False)
+
+    def clear_func(self):
+        self.reset_candidates()
+        open("data.csv", "w").close()
+        self.input_Name.clear()
+        self.input_Score.clear()
